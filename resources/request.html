@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script async defer data-website-id="9b61da17-d763-4d51-a145-b6acce1d9f82" src="https://analytics.woutfeys.be/umami.js"></script>
+    <script src="/js/example-copy.js"></script>
+    <title>Zen Live Example | Fetch a page</title>
+    <style>
+        @import url('/css/general.css');
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        details {
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            padding: 0.5em 0.5em 0;
+            margin-bottom: 5px;
+        }
+
+        summary {
+            font-weight: bold;
+            margin: -0.5em -0.5em 0;
+            padding: 0.5em;
+        }
+
+        details[open] {
+            padding: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<a href="/"><img src="/aikido_logo.svg" class="logo" /></a>
+<div class="container">
+    <h1>SSRF | Fetch a page</h1>
+    <div id="urlForm">
+        <details open>
+            <summary>Examples</summary>
+            <code class="code example">https://aikido.dev</code>
+            <p style="display:inline">Request made to an outside service, not SSRF</p>
+            <br/>
+            <code class="code example">http://localhost:7000/</code>
+            <p style="display:inline">Trying to access local resources, an SSRF attack</p>
+        </details>
+        <label for="url">URL :</label>
+        <input type="text" id="url" name="url" class="example-input" required>
+        <button class="btn" id="req1">Make your request! (HttpURLConnection)</button>
+        <button class="btn" id="req2">Make your request! (OkHttp)</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('req1').addEventListener('click', function() {
+
+        const url = document.getElementById('url').value;
+
+        // Here you would typically send the data to your server
+        // For example, using fetch:
+        fetch('/api/request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url })
+        })
+        .then(async (response) => {
+            if (response.ok) {
+                alert(await response.text());
+            } else {
+                alert('Error executing command. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    document.getElementById('req2').addEventListener('click', function() {
+
+        const url = document.getElementById('url').value;
+
+        // Here you would typically send the data to your server
+        // For example, using fetch:
+        fetch('/api/request2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url })
+        })
+        .then(async (response) => {
+            if (response.ok) {
+                alert(await response.text());
+            } else {
+                alert('Error fetching request. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+:8080 {
+    root * /var/www/html/public
+    
+    php_server {
+        env DOCUMENT_ROOT "/var/www/html/public"
+        env AIKIDO_LOG_LEVEL "DEBUG"
+        env AIKIDO_BLOCK "1"
+        env AIKIDO_FEATURE_COLLECT_API_SCHEMA "1"
+        env AIKIDO_TOKEN ${AIKIDO_TOKEN}
+        worker {
+            file /var/www/html/public/index.php
+            num 4
+        }
+    }
+
+    file_server
+}

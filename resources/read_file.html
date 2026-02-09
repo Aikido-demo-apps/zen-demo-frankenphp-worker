@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script async defer data-website-id="9b61da17-d763-4d51-a145-b6acce1d9f82" src="https://analytics.woutfeys.be/umami.js"></script>
+    <script src="/js/example-copy.js"></script>
+    <title>Zen Live Example | Read file</title>
+    <style>
+        @import url('/css/general.css');
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        details {
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            padding: 0.5em 0.5em 0;
+            margin-bottom: 5px;
+        }
+
+        summary {
+            font-weight: bold;
+            margin: -0.5em -0.5em 0;
+            padding: 0.5em;
+        }
+
+        details[open] {
+            padding: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<a href="/"><img src="/aikido_logo.svg" class="logo" /></a>
+<form class="container" action="/api/read">
+    <h1>Path Traversal | Read a file</h1>
+    <details open>
+        <summary>Examples</summary>
+        <code class="code example">home.txt</code>
+        <p style="display:inline">Inside blog directory, opens home file</p>
+        <br/>
+        <code class="code example">2023/day2.txt</code>
+        <p style="display:inline">Inside blog directory, opens a blog entry</p>
+        <br/>
+        <code class="code example">../secrets/key.txt</code>
+        <p style="display:inline">Path traversal, opens a file outside blog directory</p>
+    </details>
+    <div id="readForm">
+        <label for="path"><b>Path :</b></label>
+        <input type="text" id="path" name="path" class="example-input" required>
+        <button class="btn" type="submit">Read file</button>
+    </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+cd /tmp || exit
+
+curl -L -O "https://github.com/AikidoSec/firewall-php/releases/download/v1.5.0-frankenphp-beta/aikido-php-firewall.$(uname -m).deb"
+dpkg -i -E "./aikido-php-firewall.$(uname -m).deb"
