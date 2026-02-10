@@ -23,7 +23,7 @@ RUN apt-get update \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
     && ln -sf /etc/alternatives/vim /usr/bin/vim \
     && apt-get update \
-    && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt) \
+    && install-php-extensions pdo_pgsql pgsql \
     && mkdir -p /var/www/html/public && echo "index" > /var/www/html/public/index.php \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
