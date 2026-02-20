@@ -34,8 +34,6 @@ while (frankenphp_handle_request(function () use ($app) {
     $app->terminate($request, $response);
 
     \aikido\worker_rshutdown();
-    
-    return $response;
 })) {
     // keep looping
 }
