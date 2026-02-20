@@ -30,11 +30,12 @@ while (frankenphp_handle_request(function () use ($app) {
     $app->instance('request', $request);
 
     $response = $app->handle($request);
-    $response->send();
-
+    
     $app->terminate($request, $response);
 
     \aikido\worker_rshutdown();
+    
+    return $response;
 })) {
     // keep looping
 }
