@@ -1,7 +1,10 @@
-:8080 {
+{
     log {
         level ERROR
     }
+}
+
+:8080 {
 
     root * /var/www/html/public
 
