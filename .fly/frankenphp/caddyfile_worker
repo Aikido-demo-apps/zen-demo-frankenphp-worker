@@ -1,6 +1,10 @@
 :8080 {
+    log {
+        level ERROR
+    }
+
     root * /var/www/html/public
-    
+
     php_server {
         env DOCUMENT_ROOT "/var/www/html/public"
         env AIKIDO_TOKEN ${AIKIDO_TOKEN}
