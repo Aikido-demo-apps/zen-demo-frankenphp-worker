@@ -27,6 +27,8 @@ while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
 
     $response = $app->handle($request);
     
+    $response->send();
+    
     $app->terminate($request, $response);
 
     if ((++$nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
