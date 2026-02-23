@@ -21,23 +21,33 @@ ignore_user_abort(true);
 
 $nbRequests = 0;
 
+ignore_user_abort(true);
+
 while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     \aikido\worker_rinit();
 
-    if (class_exists(Facade::class)) {
-        Facade::clearResolvedInstances();
+    try{
+        if (class_exists(Facade::class)) {
+            Facade::clearResolvedInstances();
+        }
+    
+        $request = Request::capture();
+        $app->instance('request', $request);
+    
+        $response = $app->handle($request);
+        $response->send();
+
+        $app->terminate($request, $response);
+        
+        if (++$nbRequests % 100 === 0) {
+            gc_collect_cycles();
+        }
+    } catch (\Throwable $e) {
+        // NEVER let exceptions escape the worker loop
+        error_log((string)$e);
+
     }
-
-    $request = Request::capture();
-    $app->instance('request', $request);
-
-    $response = $app->handle($request);
-    $response->send();
-
-    if (++$nbRequests % 100 === 0) {
-        gc_collect_cycles();
-    }
-
+    
     \aikido\worker_rshutdown();
 })) {
     // keep looping
