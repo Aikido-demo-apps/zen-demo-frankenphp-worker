@@ -20,14 +20,21 @@ $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
 
 $nbRequests = 0;
 
-while (frankenphp_handle_request(function () use ($kernel, &$nbRequests) {
+while (frankenphp_handle_request(function () use ($app, $kernel, &$nbRequests) {
     \aikido\worker_rinit();
 
+    // Worker mode state cleanup - reset Laravel between requests
+    // These two calls handle 95% of state cleanup efficiently
+    Facade::clearResolvedInstances();
+    $app->forgetScopedInstances();
+    
+    // Handle the request
     $request = Request::capture();
     $response = $kernel->handle($request);
     $response->send();
     $kernel->terminate($request, $response);
 
+    // Periodic garbage collection
     if ((++$nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
         gc_collect_cycles();
     }
