@@ -22,7 +22,11 @@ $nbRequests = 0;
 while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     \aikido\worker_rinit();
 
-    $app->handleRequest(Request::capture());
+    $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+    $request = Request::capture();
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
 
     if ((++$nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
         gc_collect_cycles();
