@@ -6,7 +6,7 @@
         env AIKIDO_TOKEN ${AIKIDO_TOKEN}
         worker {
             file /var/www/html/public/index.php
-            num 4
+            num 5
         }
     }
 

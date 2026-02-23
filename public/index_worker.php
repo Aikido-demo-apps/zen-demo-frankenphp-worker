@@ -22,10 +22,6 @@ $nbRequests = 0;
 while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     \aikido\worker_rinit();
 
-    if (class_exists(Facade::class)) {
-        Facade::clearResolvedInstances();
-    }
-
     $request = Request::capture();
     $app->instance('request', $request);
 
