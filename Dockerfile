@@ -26,7 +26,8 @@ RUN apt-get update \
     && install-php-extensions pdo_pgsql pgsql \
     && mkdir -p /var/www/html/public && echo "index" > /var/www/html/public/index.php \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
+    && rm -f /usr/local/etc/php/conf.d/docker-php-ext-pcntl.ini
 
 # 2. Copy config files to proper locations
 COPY .fly/supervisor/ /etc/supervisor/

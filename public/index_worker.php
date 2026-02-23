@@ -22,38 +22,19 @@ $nbRequests = 0;
 while (frankenphp_handle_request(function () use ($baseApp, &$nbRequests) {
     \aikido\worker_rinit();
 
-    // Clone the application for this request(like Octane)
-    // This provides better isolation than just clearing facades
-    $app = clone $baseApp;
+    Facade::clearResolvedInstances();
     
-    try {
-        Facade::clearResolvedInstances();
-        
-        $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
-        
-        $request = Request::capture();
-        $response = $kernel->handle($request);
-        
-        $response->send();
-        
-        $kernel->terminate($request, $response);
-        
-        $nbRequests++;
-        
-    } finally {
-        if (method_exists($app, 'flush')) {
-            $app->flush();
-        }
-        
-        $baseApp->make('view.engine.resolver')->forget('blade');
-        $baseApp->make('view.engine.resolver')->forget('php');
-        
-        unset($app, $kernel, $request, $response);
-        
-        // Periodic garbage collection
-        if (($nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
-            gc_collect_cycles();
-        }
+    $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+    
+    $request = Request::capture();
+    $response = $kernel->handle($request);
+    
+    $response->send();
+    
+    $kernel->terminate($request, $response);
+    
+    if ((++$nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
+        gc_collect_cycles();
     }
 
     \aikido\worker_rshutdown();
