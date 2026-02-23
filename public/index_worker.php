@@ -14,15 +14,16 @@ if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php'
 // Autoload + bootstrap once
 require __DIR__ . '/../vendor/autoload.php';
 
-/** @var Application $baseApp */
-$baseApp = require __DIR__ . '/../bootstrap/app.php';
+/** @var Application $app */
+$app = require __DIR__ . '/../bootstrap/app.php';
 
 $nbRequests = 0;
 
-while (frankenphp_handle_request(function () use ($baseApp, &$nbRequests) {
+while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     \aikido\worker_rinit();
 
     Facade::clearResolvedInstances();
+    $app->forgetScopedInstances();
     
     $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
     
