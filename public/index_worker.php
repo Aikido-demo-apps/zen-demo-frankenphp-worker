@@ -26,8 +26,6 @@ while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     $app->instance('request', $request);
 
     $response = $app->handle($request);
-
-    $response->send();
     
     $app->terminate($request, $response);
 

@@ -1,8 +1,8 @@
-{
-    log {
-        level ERROR
-    }
-}
+#{
+#    log {
+#        level ERROR
+#    }
+#}
 
 :8080 {
 
