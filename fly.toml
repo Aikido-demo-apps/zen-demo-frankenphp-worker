@@ -20,7 +20,6 @@ console_command = 'frankenphp php-cli /var/www/html/artisan tinker'
   SESSION_DRIVER = 'cookie'
   SESSION_SECURE_COOKIE = 'true'
   DB_CONNECTION = "pgsql"
-  FRANKENPHP_LOG_LEVEL = "error"
 
 [http_service]
   internal_port = 8080
