@@ -16,13 +16,13 @@ require __DIR__ . '/../vendor/autoload.php';
 
 /** @var Application $app */
 $app = require __DIR__ . '/../bootstrap/app.php';
+$kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
 
 $nbRequests = 0;
 
-while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
+while (frankenphp_handle_request(function () use ($kernel, &$nbRequests) {
     \aikido\worker_rinit();
 
-    $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
     $request = Request::capture();
     $response = $kernel->handle($request);
     $response->send();
