@@ -30,10 +30,10 @@ while (frankenphp_handle_request(function () use ($app) {
     $app->instance('request', $request);
 
     $response = $app->handle($request);
-    
+
     $app->terminate($request, $response);
 
     \aikido\worker_rshutdown();
 })) {
-    // keep looping
+    gc_collect_cycles();
 }
