@@ -17,8 +17,9 @@ require __DIR__ . '/../vendor/autoload.php';
 /** @var Application $app */
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-// Worker loop: FrankenPHP will call this callback for each HTTP request
-while (frankenphp_handle_request(function () use ($app) {
+$nbRequests = 0;
+
+while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     \aikido\worker_rinit();
 
     if (class_exists(Facade::class)) {
@@ -26,13 +27,17 @@ while (frankenphp_handle_request(function () use ($app) {
     }
 
     $request = Request::capture();
-
     $app->instance('request', $request);
 
     $response = $app->handle($request);
-    $response->send();
 
+    $response->send();
+    
     $app->terminate($request, $response);
+
+    if ((++$nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
+        gc_collect_cycles();
+    }
 
     \aikido\worker_rshutdown();
 })) {
