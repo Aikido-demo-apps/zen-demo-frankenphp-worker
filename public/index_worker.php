@@ -23,19 +23,19 @@ while (frankenphp_handle_request(function () use ($app, &$nbRequests) {
     \aikido\worker_rinit();
 
     try{
-    if (class_exists(Facade::class)) {
-        Facade::clearResolvedInstances();
-    }
+        if (class_exists(Facade::class)) {
+            Facade::clearResolvedInstances();
+        }
 
-    $request = Request::capture();
-    $app->instance('request', $request);
+        $request = Request::capture();
+        $app->instance('request', $request);
 
-    $response = $app->handle($request);
+        $response = $app->handle($request);
 
-    $response->send();
-    
-    $app->terminate($request, $response);
-    } catch (Throwable $e) {
+        $response->send();
+        
+        $app->terminate($request, $response);
+    } finally {
         if ((++$nbRequests % 100) === 0 && function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
         }
