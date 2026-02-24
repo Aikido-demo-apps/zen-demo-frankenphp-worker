@@ -5,7 +5,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
-use Illuminate\Container\Container;
 
 define('LARAVEL_START', microtime(true));
 
@@ -25,19 +24,12 @@ $nbRequests = 0;
 while (frankenphp_handle_request(function () use ($app, $kernel, &$nbRequests) {
     \aikido\worker_rinit();
 
-    $sandbox = clone $app;
-    $sandbox->instance('app', $sandbox);
-    $sandbox->instance(Container::class, $sandbox);
-    Container::setInstance($sandbox);
     Facade::clearResolvedInstances();
-    Facade::setFacadeApplication($sandbox);
 
     try {
         $request = Request::capture();
         $request->enableHttpMethodParameterOverride();
-        $sandbox->instance('request', $request);
-
-        giveNewAppToManagers($sandbox);
+        $app->instance('request', $request);
 
         $response = $kernel->handle($request);
         $response->send();
@@ -49,19 +41,15 @@ while (frankenphp_handle_request(function () use ($app, $kernel, &$nbRequests) {
             }
         }
     } finally {
-        if (method_exists($sandbox, 'forgetScopedInstances')) {
-            $sandbox->forgetScopedInstances();
+        if (method_exists($app, 'forgetScopedInstances')) {
+            $app->forgetScopedInstances();
         }
 
-        flushState($sandbox);
+        flushState($app);
 
-        $sandbox->flush();
+        $app->forgetInstance('request');
 
-        unset($sandbox, $request, $response, $route);
-
-        Container::setInstance($app);
-        Facade::clearResolvedInstances();
-        Facade::setFacadeApplication($app);
+        unset($request, $response, $route);
 
         if ((++$nbRequests % 100) === 0) {
             gc_collect_cycles();
@@ -74,69 +62,40 @@ while (frankenphp_handle_request(function () use ($app, $kernel, &$nbRequests) {
     // keep looping
 }
 
-function giveNewAppToManagers(Application $sandbox): void
+function flushState(Application $app): void
 {
-    $managers = ['db', 'cache', 'log', 'mail.manager', 'queue', 'filesystem', 'auth'];
-    foreach ($managers as $binding) {
-        if ($sandbox->resolved($binding)) {
-            $manager = $sandbox->make($binding);
-            if (method_exists($manager, 'setApplication')) {
-                $manager->setApplication($sandbox);
-            }
-        }
+    if ($app->resolved('cookie')) {
+        $app->make('cookie')->flushQueuedCookies();
     }
 
-    if ($sandbox->resolved('router')) {
-        $sandbox->make('router')->setContainer($sandbox);
+    if ($app->resolved('auth')) {
+        $app->make('auth')->forgetGuards();
     }
 
-    if ($sandbox->resolved('url')) {
-        $sandbox->make('url')->setRootControllerNamespace('');
-    }
-
-    if ($sandbox->resolved('view')) {
-        $sandbox->make('view')->setContainer($sandbox);
-    }
-
-    if ($sandbox->resolved('validator')) {
-        $sandbox->make('validator')->setContainer($sandbox);
-    }
-}
-
-function flushState(Application $sandbox): void
-{
-    if ($sandbox->resolved('cookie')) {
-        $sandbox->make('cookie')->flushQueuedCookies();
-    }
-
-    if ($sandbox->resolved('session')) {
-        $driver = $sandbox->make('session');
-        if (method_exists($driver, 'flush')) {
-            $driver->flush();
-        }
-    }
-
-    if ($sandbox->resolved('auth')) {
-        $sandbox->make('auth')->forgetGuards();
-    }
-
-    if ($sandbox->resolved('db')) {
-        foreach ($sandbox->make('db')->getConnections() as $connection) {
+    if ($app->resolved('db')) {
+        foreach ($app->make('db')->getConnections() as $connection) {
             $connection->flushQueryLog();
         }
     }
 
-    if ($sandbox->resolved('log')) {
-        $logger = $sandbox->make('log');
+    if ($app->resolved('log')) {
+        $logger = $app->make('log');
         if (method_exists($logger, 'flushSharedContext')) {
             $logger->flushSharedContext();
         }
     }
 
+    if ($app->resolved('session')) {
+        $driver = $app->make('session');
+        if (method_exists($driver, 'flush')) {
+            $driver->flush();
+        }
+    }
+
     Str::flushCache();
 
-    if ($sandbox->resolved('view.engine.resolver')) {
-        $resolver = $sandbox->make('view.engine.resolver');
+    if ($app->resolved('view.engine.resolver')) {
+        $resolver = $app->make('view.engine.resolver');
         $resolver->forget('blade');
         $resolver->forget('php');
     }
