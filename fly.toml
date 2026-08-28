@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'zen-demo-frankenphp-worker'
+app = 'zen-frankenphp-worker'
 primary_region = 'ams'
 console_command = 'frankenphp php-cli /var/www/html/artisan tinker'
 
